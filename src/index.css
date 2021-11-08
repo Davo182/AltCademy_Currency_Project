@@ -1,3 +1,6 @@
+.App {
+  height: 100vh;
+}
 .exchange-input {
   width: 95%;
   height: 100px;
@@ -25,7 +28,9 @@
   background-color: #0275d8;
   color: white;
 }
-
+.amount-input {
+  width: 100%;
+}
 @media (min-width: 768px) {
   .exchanger {
     width: 50%;
@@ -34,6 +39,10 @@
     width: 50%;
   }
   .exchange-input {
+    width: 50%;
+  }
+
+  .amount-input {
     width: 50%;
   }
 }

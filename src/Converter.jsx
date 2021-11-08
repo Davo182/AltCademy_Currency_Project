@@ -5,15 +5,17 @@ class Converter extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currencieOne: "",
-            currencieTwo: "",
+            currencieOne: "NOPT",
+            currencieTwo: "NOPT",
             currencies: {},
             amount: 1.0,
-            result: {}
+            result: {},
+            amountConverted: 0.0
         }
 
         this.changeInput = this.changeInput.bind(this);
         this.convert = this.convert.bind(this);
+        this.swap = this.swap.bind(this);
     }
 
     componentDidMount() {
@@ -30,35 +32,57 @@ class Converter extends React.Component {
         const { value } = e.target;
         if (value && e.target.id === "currency1") this.setState({ currencieOne: value });
         if (value && e.target.id === "currency2") this.setState({ currencieTwo: value });
+        if (e.target.id === "amount") this.setState({ amount: e.target.value });
     }
 
     convert() {
-        const {currencieOne, currencieTwo} = this.state;
-        fetch(`https://altexchangerateapi.herokuapp.com/latest?from=${currencieOne}&to=${currencieTwo}`)
-            .then(resp => {
-                if (resp.ok) return resp.json();
-                throw new Error('SW');
-            })
-            .then(data => this.setState({ result: data.rates }))
-            .catch(error => console.log(error));
+        const { currencieOne, currencieTwo, amount } = this.state;
+        if (currencieOne !== "NOPT" && currencieTwo !== "NOPT") {
+
+            fetch(`https://altexchangerateapi.herokuapp.com/latest?amount=${amount}&from=${currencieOne}&to=${currencieTwo}`)
+                .then(resp => {
+                    if (resp.ok) return resp.json();
+                    throw new Error('SW');
+                })
+                .then(data => {
+                    this.setState({ result: data.rates });
+                    this.setState({ amountConverted: data.rates[currencieTwo] })
+                })
+                .catch(error => window.alert("Please, select a valid Currency"));
+        } else window.alert("Please select a currency");
     }
 
-    
-
+    swap() {
+        const { currencieOne, currencieTwo, amountConverted, amount } = this.state;
+        this.setState({ amount: amountConverted, amountConverted: amount });
+        this.setState({ currencieOne: currencieTwo, currencieTwo: currencieOne });
+    }
     render() {
-        const { currencies, amount, result } = this.state;
-        console.log(result);
-        
+        const { currencies, amount, amountConverted, currencieOne, currencieTwo } = this.state;
         return (
-            <div className=" exchanger container d-flex flex-column align-items-center mt-4 shadow">
+            <div className=" container d-flex flex-column align-items-center mt-4 shadow">
                 <h2 className="align-self-center align-self-md-start p-3">💱 Converter</h2>
-                <ExchangeInput currencyList={currencies} id={"currency1"} onChangeCurrency={this.changeInput} />
-                <input type="number" placeholder="Amount" value={amount} />
-                <h5 className="my-4">To</h5>
-                <ExchangeInput currencyList={currencies} id={"currency2"} onChangeCurrency={this.changeInput} />
-                <input type="number" placeholder="Amount" disabled value={result[this.state.currencieTwo]} />
-                <button className="btn btn-info mb-3" onClick={this.convert}>Convert</button>
-
+                <div className="row w-100">
+                    <div className="col-12 col-md-5">
+                        <ExchangeInput currencyList={currencies} curencySelected={currencieOne !== "" ? currencieOne : "NOPT"} id={"currency1"} onChangeCurrency={this.changeInput} />
+                        <div className="p-3 shadow mt-3">
+                            <label htmlFor="amount">Amount</label>
+                            <input className="form-control" type="number" placeholder="Amount" id="amount" value={amount} onChange={this.changeInput} />
+                        </div>
+                    </div>
+                    <div className="col-12 col-md-2 d-flex flex-column justify-content-center align-items-center">
+                        <h3 className="my-4 text-center">To</h3>
+                        <button className="btn btn-outline-success mb-3" onClick={this.swap}><i class="bi bi-arrow-left-right"></i></button>
+                    </div>
+                    <div className="col-12 col-md-5">
+                        <ExchangeInput currencyList={currencies} curencySelected={currencieTwo !== "" ? currencieTwo : "NOPT"} id={"currency2"} onChangeCurrency={this.changeInput} />
+                        <div className="p-3 shadow mt-3">
+                            <label htmlFor="amountResult">Result</label>
+                            <input className="form-control" type="number" id="amountResult" placeholder="Amount" disabled value={amountConverted} />
+                        </div>
+                    </div>
+                </div>
+                <button className="btn btn-success m-4 w-25 text-white" onClick={this.convert}><i class="bi bi-currency-exchange"></i> Convert</button>
             </div>
         )
     }
