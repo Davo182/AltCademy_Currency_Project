@@ -1,9 +1,7 @@
 import React from "react";
 
 class ExchangeInput extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+    
 
     render() {
         const {currencyList, onChangeCurrency, id, curencySelected} = this.props;
