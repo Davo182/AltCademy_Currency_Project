@@ -6,7 +6,7 @@ class Exchanger extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currency: "USD",
+            currency: "",
             currencies: {},
             search: {}
         }
@@ -24,24 +24,25 @@ class Exchanger extends React.Component {
             .catch(error => console.log(error));
     }
     changeCurrency(e) {
-        this.setState({ currency: e.target.value })
-        fetch(`https://altexchangerateapi.herokuapp.com/latest?from=${this.state.currency}`)
-            .then(resp => {
-                if (resp.ok) return resp.json();
-                throw new Error('SW');
-            })
-            .then(data => this.setState({ search: data }))
-            .catch(error => console.log(error));
+        this.setState({ currency: e.target.value }, () => {
+            fetch(`https://altexchangerateapi.herokuapp.com/latest?from=${this.state.currency}`)
+                .then(resp => {
+                    if (resp.ok) return resp.json();
+                    throw new Error('SW');
+                })
+                .then(data => this.setState({ search: data }))
+                .catch(error => console.log(error));
+        })
     }
 
     render() {
-        const { base } = this.state.search;
+        const { currency } = this.state;
         const { currencies } = this.state;
         const { search } = this.state;
         return (
             <div className=" exchanger container d-flex flex-column align-items-center mt-4 shadow">
                 <h2 className="align-self-center align-self-md-start p-3">💱 Exchanger</h2>
-                <ExchangeInput currencyList={currencies} onChangeCurrency={this.changeCurrency} id={"currency1"} />
+                <ExchangeInput currencyList={currencies} curencySelected={currency !== "" ? currency : "NOPT"} onChangeCurrency={this.changeCurrency} id={"currency1"} />
                 <ExchangeList rates={search.rates} />
             </div>
         )
