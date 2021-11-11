@@ -17,8 +17,7 @@ class Converter extends React.Component {
         }
 
         this.chartRef = React.createRef();
-        //this.chart = undefined;
-
+        
         this.changeInput = this.changeInput.bind(this);
         this.convert = this.convert.bind(this);
         this.swap = this.swap.bind(this);
@@ -136,7 +135,7 @@ class Converter extends React.Component {
                     </div>
                     <button className="btn btn-success m-4 w-25 text-white" onClick={this.convert}><i class="bi bi-currency-exchange"></i> Convert</button>
                 </div>
-                <div className={`my-3 shadow ${this.state.chart !== undefined ? 'd-block' : 'd-none'}`}>
+                <div className={`my-4 container shadow ${this.state.chart !== undefined ? 'd-block' : 'd-none'}`}>
                     <canvas ref={this.chartRef} />
                 </div>
             </div>
